@@ -12,7 +12,9 @@ UENUM(BlueprintType)
 enum class EMenuLocation : uint8
 {
 	MainMenu		UMETA(DisplayName = "MainMenu"),
+	HostingOptions  UMETA(DisplayName = "HostingOptions"),
 	ServerFinder	UMETA(DisplayName = "ServerFinder"),
+	GameSetup		UMETA(DisplayName = "GameSetup"),
 	Options			UMETA(DisplayName = "Options")
 };
 
