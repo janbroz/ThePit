@@ -3,18 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
-#include "ThePitGameModeBase.generated.h"
+#include "GameFramework/PlayerState.h"
+#include "PitPlayerState.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class THEPIT_API AThePitGameModeBase : public AGameModeBase
+class THEPIT_API APitPlayerState : public APlayerState
 {
 	GENERATED_BODY()
 public:
-	AThePitGameModeBase();
-
+	APitPlayerState();
+	
+	
 	
 };
