@@ -9,4 +9,5 @@ AMenuGameMode::AMenuGameMode()
 {
 	DefaultPawnClass = AMenuPawn::StaticClass();
 	PlayerControllerClass = AMenuPlayerController::StaticClass();
+	
 }

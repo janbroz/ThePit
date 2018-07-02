@@ -13,8 +13,8 @@ UCLASS()
 class THEPIT_API AThePitGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
-	
-	
+public:
+	AThePitGameModeBase();
+
 	
 };

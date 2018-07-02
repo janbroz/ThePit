@@ -17,8 +17,12 @@ public:
 	AMenuPlayerController();
 	
 	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 	
 	TSubclassOf<class UMainMenuWidget> MenuWidgetClass;
 	class UMainMenuWidget* MenuWidget;
+	TSubclassOf<class ULobbyWidget> LobbyWidgetClass;
+	class ULobbyWidget* LobbyWidget;
 
+	void EscapePressed();
 };
