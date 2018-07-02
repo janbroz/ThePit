@@ -26,6 +26,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character information")
+		FString HeroName;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character information")
+		TSoftObjectPtr<UTexture2D> IconAssetId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character information")
+		UTexture2D* PortraitIcon;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character information")
+		int32 Bla;
+
 	class UCameraComponent* PlayerCamera;
 	class USpringArmComponent* CameraArm;
 };

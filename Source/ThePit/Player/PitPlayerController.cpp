@@ -3,6 +3,7 @@
 #include "PitPlayerController.h"
 #include "Player/PitCharacter.h"
 #include "Widgets/PlayerHUD/PlayerHUDWidget.h"
+#include "Widgets/PlayerHUD/CharacterSelectionWidget.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 
 APitPlayerController::APitPlayerController()
@@ -15,18 +16,33 @@ APitPlayerController::APitPlayerController()
 		HUDWidgetClass = PlayerHUD_BP.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UClass> Selection_BP(TEXT("/Game/UI/HeroSelection/Selection_BP.Selection_BP_C"));
+	if (Selection_BP.Object)
+	{
+		SelectionWidgetClass = Selection_BP.Object;
+	}
 }
 
 void APitPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (HUDWidgetClass)
+	if (bHasCharacterSelected && IsLocalController())
 	{
-		HUDWidget = CreateWidget<UPlayerHUDWidget>(this, HUDWidgetClass);
+		if (HUDWidgetClass)
+			HUDWidget = CreateWidget<UPlayerHUDWidget>(this, HUDWidgetClass);
 		if (HUDWidget)
 		{
 			HUDWidget->AddToViewport();
+		}
+	}
+	else
+	{
+		if (SelectionWidgetClass && IsLocalController())
+			SelectionWidget = CreateWidget<UCharacterSelectionWidget>(this, SelectionWidgetClass);
+		if (SelectionWidget)
+		{
+			SelectionWidget->AddToViewport();
 		}
 	}
 }
@@ -51,6 +67,22 @@ void APitPlayerController::Tick(float DeltaSeconds)
 	CheckMouseLocation();
 }
 
+void APitPlayerController::SelectCharacter(APawn* NewPawn)
+{
+	SetPawn(NewPawn);
+	Possess(NewPawn);
+
+	if (IsLocalController())
+	{
+		SelectionWidget->RemoveFromParent();
+	}
+
+	if (Role < ROLE_Authority)
+	{
+		Server_SelectCharacter(NewPawn);
+	}
+}
+
 void APitPlayerController::CheckMouseLocation()
 {
 	if (IsLocalController()) 
@@ -67,6 +99,11 @@ void APitPlayerController::CheckMouseLocation()
 void APitPlayerController::AlignCameraToMouse(FVector MouseLoc)
 {
 	ACharacter* PitChar = GetCharacter();
+	if (!PitChar)
+	{
+		return;
+	}
+
 	FVector InitLoc = PitChar->GetActorLocation();
 	FRotator LookAtRot = (MouseLoc - InitLoc).Rotation();
 	FRotator MyRot = GetControlRotation();
@@ -86,13 +123,25 @@ void APitPlayerController::Server_AlignCameraToMouse_Implementation(FVector Mous
 
 bool APitPlayerController::Server_AlignCameraToMouse_Validate(FVector MouseLoc)
 {
-	UE_LOG(LogTemp, Warning, TEXT("At the server we had: %s"), *MouseLoc.ToString());
+	//UE_LOG(LogTemp, Warning, TEXT("At the server we had: %s"), *MouseLoc.ToString());
+	return true;
+}
+
+
+
+void APitPlayerController::Server_SelectCharacter_Implementation(APawn* NewPawn)
+{
+	SelectCharacter(NewPawn);
+}
+
+bool APitPlayerController::Server_SelectCharacter_Validate(APawn* NewPawn)
+{
 	return true;
 }
 
 void APitPlayerController::VerticalMovement(float Amount)
 {
-	if (Amount != 0.0f)
+	if (GetPawn() && Amount != 0.0f)
 	{
 		ACharacter* PitChar = GetCharacter();
 		if (PitChar)
@@ -104,7 +153,7 @@ void APitPlayerController::VerticalMovement(float Amount)
 
 void APitPlayerController::HorizontalMovement(float Amount)
 {
-	if (Amount != 0.0f)
+	if (GetPawn() && Amount != 0.0f)
 	{
 		ACharacter* PitChar = GetCharacter();
 		if (PitChar)
@@ -130,3 +179,31 @@ void APitPlayerController::RMBPressed()
 {
 }
 
+bool APitPlayerController::HasCharacterSelected()
+{
+	return bHasCharacterSelected;
+}
+
+void APitPlayerController::HiddeSelectionWidget()
+{
+	if (SelectionWidget)
+	{
+		SelectionWidget->RemoveFromParent();
+	}
+}
+
+void APitPlayerController::SpawnPlayerHUD()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Tried to spawn a hud"));
+	if (IsLocalController())
+	{
+
+		if (HUDWidgetClass)
+			HUDWidget = CreateWidget<UPlayerHUDWidget>(this, HUDWidgetClass);
+		if (HUDWidget)
+		{
+			HUDWidget->SetupWidgetInformation(GetPawn());
+			HUDWidget->AddToViewport();
+		}
+	}
+}

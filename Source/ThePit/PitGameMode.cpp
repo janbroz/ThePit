@@ -10,7 +10,7 @@ APitGameMode::APitGameMode()
 {
 	PlayerControllerClass = APitPlayerController::StaticClass();
 
-	static ConstructorHelpers::FObjectFinder<UClass> Player_BP(TEXT("/Game/Characters/PlayerCharacters/Jhon.Jhon_C"));
+	/*static ConstructorHelpers::FObjectFinder<UClass> Player_BP(TEXT("/Game/Characters/PlayerCharacters/Jhon.Jhon_C"));
 	if (Player_BP.Object)
 	{
 		DefaultPawnClass = Player_BP.Object;
@@ -18,7 +18,8 @@ APitGameMode::APitGameMode()
 	else
 	{
 		DefaultPawnClass = APitCharacter::StaticClass();
-	}
+	}*/
+	DefaultPawnClass = NULL;
 
 	PlayerStateClass = APitPlayerState::StaticClass();
 }
@@ -30,4 +31,10 @@ void APitGameMode::PostLogin(APlayerController* NewPlayer)
 	PlayerControllerList.Add(NewPlayer);
 
 	UE_LOG(LogTemp, Warning, TEXT("Hey there, a new player joined us!"));
+}
+
+APawn* APitGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)	
+{
+	Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+	return nullptr;
 }

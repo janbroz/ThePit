@@ -31,13 +31,26 @@ public:
 	void AlignCameraToMouse(FVector MouseLoc);
 	void CheckMouseLocation();
 
+	bool HasCharacterSelected();
+	void SelectCharacter(APawn* NewPawn);
+	void HiddeSelectionWidget();
+	void SpawnPlayerHUD();
+
 public:
 	// Replication and stuff
 	UFUNCTION(Reliable, Server, WithValidation)
 		void Server_AlignCameraToMouse(FVector MouseLoc);
-
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_SelectCharacter(APawn* NewPawn);
 
 public:
 	TSubclassOf<class UPlayerHUDWidget> HUDWidgetClass;
 	class UPlayerHUDWidget* HUDWidget;
+
+	TSubclassOf<class UCharacterSelectionWidget> SelectionWidgetClass;
+	class UCharacterSelectionWidget* SelectionWidget;
+
+private:
+	uint32 bHasCharacterSelected : 1;
+
 };

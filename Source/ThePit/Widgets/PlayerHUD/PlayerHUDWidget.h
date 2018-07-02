@@ -13,8 +13,16 @@ UCLASS()
 class THEPIT_API UPlayerHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
-	
+
+public:
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Information")
+		class APitCharacter* HeroPawn;
+
+public:
+	UFUNCTION()
+		void SetupWidgetInformation(APawn* Character);
+	UFUNCTION(BlueprintImplementableEvent)
+		void UpdateHeroUI();
 	
 	
 };

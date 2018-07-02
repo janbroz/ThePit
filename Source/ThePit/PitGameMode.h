@@ -17,6 +17,7 @@ public:
 	APitGameMode();
 	
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, class AActor* StartSpot) override;
 
 public:
 	int32 MaxNumPlayers;
