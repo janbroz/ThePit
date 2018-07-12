@@ -3,6 +3,9 @@
 #include "PitCharacter.h"
 #include "Runtime/Engine/Classes/Camera/CameraComponent.h"
 #include "Runtime/Engine/Classes/GameFramework/SpringArmComponent.h"
+#include "PitAbilities/PitAbilityComponent.h"
+#include "Net/UnrealNetwork.h"
+#include "Engine/ActorChannel.h"
 
 // Sets default values
 APitCharacter::APitCharacter()
@@ -22,6 +25,16 @@ APitCharacter::APitCharacter()
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	PlayerCamera->SetupAttachment(CameraArm, CameraArm->SocketName);
+
+	// Abilities and stuff
+	AbilitySystem = CreateDefaultSubobject<UPitAbilityComponent>(TEXT("Ability system"));
+	if (AbilitySystem)
+	{
+		AbilitySystem->SetNetAddressable();
+		AbilitySystem->SetIsReplicated(true);
+	}
+	bReplicates = true;
+	
 }
 
 // Called when the game starts or when spawned
@@ -29,6 +42,11 @@ void APitCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	/*if (AbilitySystem)
+	{
+		
+		AbilitySystem->InitiAttributeSet();
+	}*/
 }
 
 // Called every frame
@@ -45,3 +63,51 @@ void APitCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 }
 
+void APitCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(APitCharacter, AbilitySystem);
+	DOREPLIFETIME(APitCharacter, BoolTest);
+	DOREPLIFETIME(APitCharacter, Attributes);
+}
+
+void APitCharacter::OnRep_AbilitySystemReplicated()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Shit, there was a change on the fucking ability system"));
+}
+
+void APitCharacter::OnRep_BoolTest()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Bool test changed"));
+}
+
+void APitCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	if (HasAuthority())
+	{
+		AbilitySystem->SetIsReplicated(true);
+		AbilitySystem->InitiAttributeSet();
+	}
+
+	/*if (HasAuthority())
+	{
+		AbilitySystem->AttributeSet = NewObject<UPitAttribute>(this);
+		Attributes = NewObject<UPitAttribute>(this);
+	}*/
+}
+
+//bool APitCharacter::ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags)
+//{
+//	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+//	if (AbilitySystem->AttributeSet != nullptr)
+//	{
+//		WroteSomething |= Channel->ReplicateSubobject(AbilitySystem->AttributeSet, *Bunch, *RepFlags);
+//	}
+//	else {
+//		UE_LOG(LogTemp, Warning, TEXT("Fuck it is empty"));
+//	}
+//	return WroteSomething;
+//}

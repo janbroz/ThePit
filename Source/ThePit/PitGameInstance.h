@@ -7,6 +7,7 @@
 #include "Online.h"
 #include "FindSessionsCallbackProxy.h"
 #include "Data/DataStructures.h"
+#include "Engine/DataTable.h"
 #include "PitGameInstance.generated.h"
 
 /**
@@ -88,7 +89,7 @@ public:
 	void OnFindSessionsComplete(bool bWasSuccessful);
 
 	// Join a session
-	bool JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
+	bool PJoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	// Destroy a session
@@ -103,4 +104,10 @@ public:
 		void JoinOnlineGame();
 	UFUNCTION(BlueprintCallable, Category = "Network with blueprints")
 		void DestroySessionAndLeaveGame();
+
+public:
+	// PROPERTIES
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Hero information")
+		UDataTable* HeroStatsTable;
+
 };

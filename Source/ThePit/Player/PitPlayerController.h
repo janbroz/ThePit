@@ -36,12 +36,19 @@ public:
 	void HiddeSelectionWidget();
 	void SpawnPlayerHUD();
 
+	void TEST_INPUT();
+	void Test2();
+
 public:
 	// Replication and stuff
 	UFUNCTION(Reliable, Server, WithValidation)
 		void Server_AlignCameraToMouse(FVector MouseLoc);
 	UFUNCTION(Reliable, Server, WithValidation)
 		void Server_SelectCharacter(APawn* NewPawn);
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_TEST_INPUT();
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_Test2();
 
 public:
 	TSubclassOf<class UPlayerHUDWidget> HUDWidgetClass;
