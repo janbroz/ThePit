@@ -17,12 +17,17 @@ class THEPIT_API UPlayerHUDWidget : public UUserWidget
 public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Information")
 		class APitCharacter* HeroPawn;
-
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Information")
+		TArray<class APitCharacter*> CurrentEnemies;
 public:
 	UFUNCTION()
 		void SetupWidgetInformation(APawn* Character);
 	UFUNCTION(BlueprintImplementableEvent)
 		void UpdateHeroUI();
-	
-	
+	UFUNCTION(BlueprintImplementableEvent)
+		void AddPlayerEnemy();
+	UFUNCTION(BlueprintImplementableEvent)
+		void UpdateEnemyHealthBars(class APitCharacter* Enemy);
+
+
 };

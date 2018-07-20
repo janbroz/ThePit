@@ -4,6 +4,7 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Runtime/Engine/Classes/Engine/World.h"
 #include "Runtime/Engine/Classes/Engine/LocalPlayer.h"
+#include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 
 UPitGameInstance::UPitGameInstance(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -17,6 +18,12 @@ UPitGameInstance::UPitGameInstance(const FObjectInitializer& ObjectInitializer)
 	OnDestroySessionCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &UPitGameInstance::OnDestroySessionComplete);
 
 	CurrentLocation = EPlayerLocation::MainMenu;
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> HeroStatsTable_BP(TEXT("DataTable'/Game/GameplayData/Heroes/Heroes-stats.Heroes-stats'"));
+	if (HeroStatsTable_BP.Object)
+	{
+		HeroStatsTable = HeroStatsTable_BP.Object;
+	}
 }
 
 bool UPitGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
@@ -157,7 +164,7 @@ void UPitGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 
 }
 
-bool UPitGameInstance::JoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
+bool UPitGameInstance::PJoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
 {
 	CurrentLocation = EPlayerLocation::Lobby;
 	// Return bool
@@ -276,7 +283,7 @@ void UPitGameInstance::JoinOnlineGame()
 			if (SessionSearch->SearchResults[i].Session.OwningUserId != Player->GetPreferredUniqueNetId())
 			{
 				SearchResult = SessionSearch->SearchResults[i];
-				JoinSession(Player->GetPreferredUniqueNetId(), GameSessionName, SearchResult);
+				PJoinSession(Player->GetPreferredUniqueNetId(), GameSessionName, SearchResult);
 				break;
 			}
 		}

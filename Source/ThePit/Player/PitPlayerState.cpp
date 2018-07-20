@@ -6,10 +6,11 @@
 #include "Player/PitCharacter.h"
 #include "Engine/World.h"
 #include "PitGameMode.h"
+#include "GameFramework/GameState.h"
 
 APitPlayerState::APitPlayerState()
 {
-	
+	bAlwaysRelevant = true;
 
 }
 
@@ -19,6 +20,7 @@ void APitPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME(APitPlayerState, SelectedHero);
 	DOREPLIFETIME(APitPlayerState, bHasCharacterSelected);
+	DOREPLIFETIME(APitPlayerState, SelectedPawn);
 }
 
 void APitPlayerState::SelectCharacter(TSubclassOf<class APitCharacter> Character)
@@ -39,25 +41,39 @@ void APitPlayerState::SelectCharacter(TSubclassOf<class APitCharacter> Character
 			APitPlayerController* PC = Cast<APitPlayerController>(GetOwner());
 			if (PC)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("The owner is a controller"));
-				APitGameMode* Mode = Cast<APitGameMode>(GetWorld()->GetAuthGameMode());
-				if (Mode)
+				AActor* SpawnedActor = GetWorld()->SpawnActor(Character);
+				if (SpawnedActor)
 				{
-					Mode->DefaultPawnClass = Character;
-					AActor* SpawnedActor = GetWorld()->SpawnActor(Character);
-					if (SpawnedActor)
+					SelectedPawn = Cast<APitCharacter>(SpawnedActor);
+					PC->SelectCharacter(Cast<APawn>(SpawnedActor));
+					PC->SpawnPlayerHUD();
+					UpdateEnemyHUDs();
+				}
+
+				//APitGameMode* Mode = Cast<APitGameMode>(GetWorld()->GetAuthGameMode());
+				//if (Mode)
+				//{
+				//	Mode->DefaultPawnClass = Character;
+				//	AActor* SpawnedActor = GetWorld()->SpawnActor(Character);
+				//	if (SpawnedActor)
+				//	{
+				//		SelectedPawn = Cast<APitCharacter>(SpawnedActor);
+				//		PC->SelectCharacter(Cast<APawn>(SpawnedActor));
+				//		PC->SpawnPlayerHUD();
+				//		//PC->AddPlayerEnemies();
+				//		//UE_LOG(LogTemp, Warning, TEXT("The pawn was created"));
+				//	}
+				//}
+
+				for (auto& PlayerS : GetWorld()->GetGameState()->PlayerArray) 
+				{
+					APitPlayerState* PitPlayerS = Cast<APitPlayerState>(PlayerS);
+					if (PitPlayerS && PitPlayerS->HasCharacterSelected())
 					{
-						PC->SelectCharacter(Cast<APawn>(SpawnedActor));
-						PC->SpawnPlayerHUD();
-						UE_LOG(LogTemp, Warning, TEXT("The pawn was created"));
+						PitPlayerS->UpdateEnemyHUDs();
 					}
 				}
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("The owner is not a controller"));
-			}
-
 		}
 	}
 }
@@ -75,12 +91,53 @@ bool APitPlayerState::ServerSelectCharacter_Validate(TSubclassOf<class APitChara
 void APitPlayerState::OnRep_CharacterSelected()
 {
 	APitPlayerController* PC = Cast<APitPlayerController>(GetOwner());
+	if (PC && PC->IsLocalPlayerController())
+	{
+		PC->HiddeSelectionWidget();
+		PC->SpawnPlayerHUD();
+		UpdateEnemyHUDs();
+	}
+
+
+	//APitPlayerController* PC = Cast<APitPlayerController>(GetOwner());
+	//if (PC)
+	//{
+	//	UE_LOG(LogTemp, Warning, TEXT("Someone picked something"));
+	//	if (Role < ROLE_Authority)
+	//	{
+	//		PC->HiddeSelectionWidget();
+	//		PC->SpawnPlayerHUD();
+	//		//PC->AddPlayerEnemies();
+	//		//UpdateEnemyHUDs();
+
+	//		for (auto& PlayerS : GetWorld()->GetGameState()->PlayerArray)
+	//		{
+	//			APitPlayerState* PitPlayerS = Cast<APitPlayerState>(PlayerS);
+	//			if (PitPlayerS && PitPlayerS->HasCharacterSelected())
+	//			{
+	//				PitPlayerS->UpdateEnemyHUDs();
+	//			}
+	//		}
+	//	}
+	//}
+
+	//UpdateEnemyHUDs();
+}
+
+void APitPlayerState::UpdateEnemyHUDs_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player is: %s"), *GetPlayerName());
+	APitPlayerController* PC = Cast<APitPlayerController>(GetOwner());
 	if (PC)
 	{
-		if (Role < ROLE_Authority)
+		if (PC->IsLocalController())
 		{
-			PC->HiddeSelectionWidget();
-			PC->SpawnPlayerHUD();
+			PC->AddPlayerEnemies();
 		}
 	}
+}
+
+bool APitPlayerState::HasCharacterSelected()
+{
+	return bHasCharacterSelected;
 }

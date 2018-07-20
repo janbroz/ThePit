@@ -35,6 +35,10 @@ public:
 	void SelectCharacter(APawn* NewPawn);
 	void HiddeSelectionWidget();
 	void SpawnPlayerHUD();
+	void AddPlayerEnemies();
+
+	void TEST_INPUT();
+	void Test2();
 
 public:
 	// Replication and stuff
@@ -42,13 +46,23 @@ public:
 		void Server_AlignCameraToMouse(FVector MouseLoc);
 	UFUNCTION(Reliable, Server, WithValidation)
 		void Server_SelectCharacter(APawn* NewPawn);
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_TEST_INPUT();
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_Test2();
 
 public:
+	// Widgets
 	TSubclassOf<class UPlayerHUDWidget> HUDWidgetClass;
 	class UPlayerHUDWidget* HUDWidget;
 
 	TSubclassOf<class UCharacterSelectionWidget> SelectionWidgetClass;
 	class UCharacterSelectionWidget* SelectionWidget;
+
+	// Information
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere, Category = "Player information")
+		class APitCharacter* SelectedEnemy;
+
 
 private:
 	uint32 bHasCharacterSelected : 1;

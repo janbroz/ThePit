@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "PitAbilities/PitAttribute.h"
 #include "PitCharacter.generated.h"
 
 UCLASS()
@@ -26,6 +27,25 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
+	UFUNCTION(BlueprintCallable)
+		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+
+	UFUNCTION(NetMulticast, Unreliable)
+		void Multicast_UpdateEnemyHUDs();
+
+	UFUNCTION()
+		void OnRep_AbilitySystemReplicated();
+	UFUNCTION()
+		void OnRep_BoolTest();
+
+	virtual void PostInitializeComponents() override;
+	//virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character information")
@@ -36,6 +56,12 @@ public:
 		UTexture2D* PortraitIcon;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character information")
 		int32 Bla;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character information", Transient, ReplicatedUsing = OnRep_AbilitySystemReplicated)
+		class UPitAbilityComponent* AbilitySystem;
+	UPROPERTY(Transient, ReplicatedUsing = OnRep_BoolTest)
+		bool BoolTest;
+	/*UPROPERTY(Replicated)
+		UPitAttribute* Attributes;*/
 
 	class UCameraComponent* PlayerCamera;
 	class USpringArmComponent* CameraArm;

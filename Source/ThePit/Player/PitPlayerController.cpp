@@ -5,6 +5,8 @@
 #include "Widgets/PlayerHUD/PlayerHUDWidget.h"
 #include "Widgets/PlayerHUD/CharacterSelectionWidget.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
+#include "PitAbilities/PitAbilityComponent.h"
+#include "Player/PitPlayerState.h"
 
 APitPlayerController::APitPlayerController()
 {
@@ -58,6 +60,8 @@ void APitPlayerController::SetupInputComponent()
 	InputComponent->BindAction("ScorePressed", IE_Pressed, this, &APitPlayerController::ScorePressed);
 	InputComponent->BindAction("LMB", IE_Pressed, this, &APitPlayerController::LMBPressed);
 	InputComponent->BindAction("RMB", IE_Pressed, this, &APitPlayerController::RMBPressed);
+	InputComponent->BindAction("TestInput", IE_Pressed, this, &APitPlayerController::TEST_INPUT);
+	InputComponent->BindAction("Spacebar", IE_Pressed, this, &APitPlayerController::Test2);
 }
 
 void APitPlayerController::Tick(float DeltaSeconds)
@@ -65,6 +69,75 @@ void APitPlayerController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	CheckMouseLocation();
+}
+
+void APitPlayerController::TEST_INPUT()
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_TEST_INPUT();
+	}
+	else
+	{
+		APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
+		if (PitPawn)
+		{
+			//PitPawn->BoolTest = !PitPawn->BoolTest;
+			UE_LOG(LogTemp, Warning, TEXT("Should change the test bool"));
+			PitPawn->AbilitySystem->AttributeSet->ModifyAttribute();
+			//PitPawn->Attributes->ModifyAttribute();
+			PitPawn->AbilitySystem->ChangeTestBool();
+			//PitPawn->BoolTest = !PitPawn->BoolTest;
+		}
+	}
+}
+
+void APitPlayerController::Test2()
+{
+	//if (Role < ROLE_Authority)
+	//{
+	//	Server_Test2();
+	//}
+	//else
+	//{
+	//	APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
+	//	if (PitPawn)
+	//	{
+	//		//FString Bla = PitPawn->AbilitySystem->TestBool2 ? "yes" : "no";
+	//		FString Bla = FString::FromInt(PitPawn->AbilitySystem->AttributeSet->Health.CurrentValue);
+	//		UE_LOG(LogTemp, Warning, TEXT("Server character health is: %s"), *Bla);
+	//	}
+	//}
+
+	APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
+	if (PitPawn)
+	{
+		APitPlayerState* PitState = Cast<APitPlayerState>(PitPawn->PlayerState);
+		if (PitState)
+		{
+			PitState->UpdateEnemyHUDs();
+		}
+	}
+}
+
+void APitPlayerController::Server_TEST_INPUT_Implementation()
+{
+	TEST_INPUT();
+}
+
+bool APitPlayerController::Server_TEST_INPUT_Validate()
+{
+	return true;
+}
+
+void APitPlayerController::Server_Test2_Implementation()
+{
+	Test2();
+}
+
+bool APitPlayerController::Server_Test2_Validate()
+{
+	return true;
 }
 
 void APitPlayerController::SelectCharacter(APawn* NewPawn)
@@ -173,10 +246,47 @@ void APitPlayerController::ScorePressed()
 
 void APitPlayerController::LMBPressed()
 {
+	FHitResult Hit;
+
+	GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, true, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		APitCharacter* HitChar = Cast<APitCharacter>(Hit.GetActor());
+		if (HitChar)
+		{
+			FString Bla = FString::FromInt(HitChar->AbilitySystem->AttributeSet->Health.CurrentValue);
+			UE_LOG(LogTemp, Warning, TEXT("Client character health is: %s"), *Bla);
+		}
+	}
 }
 
 void APitPlayerController::RMBPressed()
 {
+	FHitResult Hit;
+
+	GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, true, Hit);
+
+	if (Hit.bBlockingHit)
+	{
+		APitCharacter* HitChar = Cast<APitCharacter>(Hit.GetActor());
+		if (HitChar)
+		{
+			/*FString Bla = FString::FromInt(HitChar->AbilitySystem->AttributeSet->Strength.CurrentValue);
+			UE_LOG(LogTemp, Warning, TEXT("Client character strength is: %s"), *Bla);*/
+
+			APitPlayerState* PitState = Cast<APitPlayerState>(HitChar->PlayerState);
+			if (PitState)
+			{
+				FString IsSomething = PitState->HasCharacterSelected() ? "True" : "False";
+
+				UE_LOG(LogTemp, Warning, TEXT("Client player state says: %s"), *IsSomething);
+
+			}
+		}
+	}
+
+
 }
 
 bool APitPlayerController::HasCharacterSelected()
@@ -204,6 +314,17 @@ void APitPlayerController::SpawnPlayerHUD()
 		{
 			HUDWidget->SetupWidgetInformation(GetPawn());
 			HUDWidget->AddToViewport();
+		}
+	}
+}
+
+void APitPlayerController::AddPlayerEnemies()
+{
+	if (IsLocalController())
+	{
+		if (HUDWidget)
+		{
+			HUDWidget->AddPlayerEnemy();
 		}
 	}
 }
