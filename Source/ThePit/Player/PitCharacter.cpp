@@ -6,6 +6,7 @@
 #include "PitAbilities/PitAbilityComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Engine/ActorChannel.h"
+#include "Player/PitPlayerState.h"
 
 // Sets default values
 APitCharacter::APitCharacter()
@@ -69,7 +70,25 @@ void APitCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 
 	DOREPLIFETIME(APitCharacter, AbilitySystem);
 	DOREPLIFETIME(APitCharacter, BoolTest);
-	DOREPLIFETIME(APitCharacter, Attributes);
+	/*DOREPLIFETIME(APitCharacter, Attributes);*/
+}
+
+void APitCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	Multicast_UpdateEnemyHUDs();
+}
+
+void APitCharacter::Multicast_UpdateEnemyHUDs_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("The player was possesed by an evil ancient"));
+	
+	APitPlayerState* PState = Cast<APitPlayerState>(this->PlayerState);
+	if (PState)
+	{
+		PState->UpdateEnemyHUDs();
+	}
 }
 
 void APitCharacter::OnRep_AbilitySystemReplicated()
@@ -91,23 +110,30 @@ void APitCharacter::PostInitializeComponents()
 		AbilitySystem->SetIsReplicated(true);
 		AbilitySystem->InitiAttributeSet();
 	}
-
-	/*if (HasAuthority())
-	{
-		AbilitySystem->AttributeSet = NewObject<UPitAttribute>(this);
-		Attributes = NewObject<UPitAttribute>(this);
-	}*/
 }
 
-//bool APitCharacter::ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags)
-//{
-//	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
-//	if (AbilitySystem->AttributeSet != nullptr)
-//	{
-//		WroteSomething |= Channel->ReplicateSubobject(AbilitySystem->AttributeSet, *Bunch, *RepFlags);
-//	}
-//	else {
-//		UE_LOG(LogTemp, Warning, TEXT("Fuck it is empty"));
-//	}
-//	return WroteSomething;
-//}
+float APitCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float NewDamage = Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	if (Role < ROLE_Authority)
+	{
+		Server_TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	}
+	else
+	{
+		AbilitySystem->AttributeSet->ModifyAttribute();
+	}
+
+	return NewDamage;
+}
+
+void APitCharacter::Server_TakeDamage_Implementation(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+}
+
+bool APitCharacter::Server_TakeDamage_Validate(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	return true;
+}

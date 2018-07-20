@@ -6,6 +6,7 @@
 #include "Widgets/PlayerHUD/CharacterSelectionWidget.h"
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "PitAbilities/PitAbilityComponent.h"
+#include "Player/PitPlayerState.h"
 
 APitPlayerController::APitPlayerController()
 {
@@ -93,18 +94,28 @@ void APitPlayerController::TEST_INPUT()
 
 void APitPlayerController::Test2()
 {
-	if (Role < ROLE_Authority)
+	//if (Role < ROLE_Authority)
+	//{
+	//	Server_Test2();
+	//}
+	//else
+	//{
+	//	APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
+	//	if (PitPawn)
+	//	{
+	//		//FString Bla = PitPawn->AbilitySystem->TestBool2 ? "yes" : "no";
+	//		FString Bla = FString::FromInt(PitPawn->AbilitySystem->AttributeSet->Health.CurrentValue);
+	//		UE_LOG(LogTemp, Warning, TEXT("Server character health is: %s"), *Bla);
+	//	}
+	//}
+
+	APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
+	if (PitPawn)
 	{
-		Server_Test2();
-	}
-	else
-	{
-		APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
-		if (PitPawn)
+		APitPlayerState* PitState = Cast<APitPlayerState>(PitPawn->PlayerState);
+		if (PitState)
 		{
-			//FString Bla = PitPawn->AbilitySystem->TestBool2 ? "yes" : "no";
-			FString Bla = FString::FromInt(PitPawn->AbilitySystem->AttributeSet->Health.CurrentValue);
-			UE_LOG(LogTemp, Warning, TEXT("Server character health is: %s"), *Bla);
+			PitState->UpdateEnemyHUDs();
 		}
 	}
 }
@@ -261,8 +272,17 @@ void APitPlayerController::RMBPressed()
 		APitCharacter* HitChar = Cast<APitCharacter>(Hit.GetActor());
 		if (HitChar)
 		{
-			FString Bla = FString::FromInt(HitChar->AbilitySystem->AttributeSet->Strength.CurrentValue);
-			UE_LOG(LogTemp, Warning, TEXT("Client character strength is: %s"), *Bla);
+			/*FString Bla = FString::FromInt(HitChar->AbilitySystem->AttributeSet->Strength.CurrentValue);
+			UE_LOG(LogTemp, Warning, TEXT("Client character strength is: %s"), *Bla);*/
+
+			APitPlayerState* PitState = Cast<APitPlayerState>(HitChar->PlayerState);
+			if (PitState)
+			{
+				FString IsSomething = PitState->HasCharacterSelected() ? "True" : "False";
+
+				UE_LOG(LogTemp, Warning, TEXT("Client player state says: %s"), *IsSomething);
+
+			}
 		}
 	}
 
@@ -294,6 +314,17 @@ void APitPlayerController::SpawnPlayerHUD()
 		{
 			HUDWidget->SetupWidgetInformation(GetPawn());
 			HUDWidget->AddToViewport();
+		}
+	}
+}
+
+void APitPlayerController::AddPlayerEnemies()
+{
+	if (IsLocalController())
+	{
+		if (HUDWidget)
+		{
+			HUDWidget->AddPlayerEnemy();
 		}
 	}
 }

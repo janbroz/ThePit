@@ -27,6 +27,18 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void PossessedBy(AController* NewController) override;
+
+	UFUNCTION(BlueprintCallable)
+		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
+
+	UFUNCTION(NetMulticast, Unreliable)
+		void Multicast_UpdateEnemyHUDs();
+
 	UFUNCTION()
 		void OnRep_AbilitySystemReplicated();
 	UFUNCTION()
@@ -48,8 +60,8 @@ public:
 		class UPitAbilityComponent* AbilitySystem;
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_BoolTest)
 		bool BoolTest;
-	UPROPERTY(Replicated)
-		UPitAttribute* Attributes;
+	/*UPROPERTY(Replicated)
+		UPitAttribute* Attributes;*/
 
 	class UCameraComponent* PlayerCamera;
 	class USpringArmComponent* CameraArm;

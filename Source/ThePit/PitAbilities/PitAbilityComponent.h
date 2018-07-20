@@ -37,7 +37,7 @@ public:
 	UFUNCTION()
 		void ChangeTestBool();
 public:
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_AttributeSetWasReplicated)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, ReplicatedUsing = OnRep_AttributeSetWasReplicated)
 		UPitAttribute* AttributeSet;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		EHeroClass HeroClass;

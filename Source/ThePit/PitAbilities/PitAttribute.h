@@ -91,7 +91,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor attributes", ReplicatedUsing = OnRep_HealthChanged)
 		FAttributeData Health;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor attributes", Replicated)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor attributes", ReplicatedUsing = OnRep_HealthChanged)
 		FAttributeData MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Actor attributes", Replicated)
 		FAttributeData Mana;

@@ -63,7 +63,7 @@ void UPitAttribute::ModifyAttribute()
 	Health.CurrentValue -= 1.f;
 	RepliFloat += 2.f;
 
-	UE_LOG(LogTemp, Warning, TEXT("Called on server?"));
+	//UE_LOG(LogTemp, Warning, TEXT("Called on server?"));
 	if (UpdateUIDelegate.IsBound())
 	{
 		UpdateUIDelegate.Broadcast(FMath::Rand());
@@ -72,7 +72,7 @@ void UPitAttribute::ModifyAttribute()
 
 void UPitAttribute::OnRep_HealthChanged()
 {
-	UE_LOG(LogTemp, Warning, TEXT("the health was modified"));
+	//UE_LOG(LogTemp, Warning, TEXT("the health was modified"));
 	if (UpdateUIDelegate.IsBound())
 	{
 		UpdateUIDelegate.Broadcast(FMath::Rand());

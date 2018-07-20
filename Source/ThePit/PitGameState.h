@@ -18,6 +18,9 @@ public:
 	
 	void AddScore(int32 Points);
 
+
+
+
 public:
 	UPROPERTY(Replicated)
 		int32 ReplyPoints;

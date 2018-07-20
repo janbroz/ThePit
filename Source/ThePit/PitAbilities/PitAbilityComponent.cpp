@@ -106,7 +106,7 @@ FName UPitAbilityComponent::GetNameFromClass()
 
 void UPitAbilityComponent::OnRep_AttributeSetWasReplicated()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Replicated a variable from the server, yay"));
+	//UE_LOG(LogTemp, Warning, TEXT("Replicated a variable from the server, yay"));
 }
 
 void UPitAbilityComponent::ChangeTestBool()
