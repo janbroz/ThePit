@@ -26,7 +26,7 @@ UPitGameInstance::UPitGameInstance(const FObjectInitializer& ObjectInitializer)
 	}
 }
 
-bool UPitGameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
+bool UPitGameInstance::HostSession(FUniqueNetIdRepl UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers)
 {
 	IOnlineSubsystem* const OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
@@ -99,7 +99,7 @@ void UPitGameInstance::OnStartOnlineGameComplete(FName SessionName, bool bWasSuc
 	}
 }
 
-void UPitGameInstance::FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence)
+void UPitGameInstance::FindSessions(FUniqueNetIdRepl UserId, bool bIsLAN, bool bIsPresence)
 {
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 	if (OnlineSub)
@@ -164,7 +164,7 @@ void UPitGameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 
 }
 
-bool UPitGameInstance::PJoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
+bool UPitGameInstance::PJoinSession(FUniqueNetIdRepl UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult)
 {
 	CurrentLocation = EPlayerLocation::Lobby;
 	// Return bool
@@ -261,6 +261,7 @@ void UPitGameInstance::StartOnlineGame()
 {
 	ULocalPlayer* const Player = GetFirstGamePlayer();
 	HostSession(Player->GetPreferredUniqueNetId(), GameSessionName, true, true, 4);
+	
 }
 
 void UPitGameInstance::FindOnlineGames()

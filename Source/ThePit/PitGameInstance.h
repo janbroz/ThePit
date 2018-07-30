@@ -80,16 +80,16 @@ public:
 	virtual void OnStartOnlineGameComplete(FName SessionName, bool bWasSuccessful);
 	
 	// Host a game
-	bool HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
+	bool HostSession(FUniqueNetIdRepl UserId, FName SessionName, bool bIsLAN, bool bIsPresence, int32 MaxNumPlayers);
 	
 	// Find a session
-	void FindSessions(TSharedPtr<const FUniqueNetId> UserId, bool bIsLAN, bool bIsPresence);
+	void FindSessions(FUniqueNetIdRepl UserId, bool bIsLAN, bool bIsPresence);
 
 	// We found the session
 	void OnFindSessionsComplete(bool bWasSuccessful);
 
 	// Join a session
-	bool PJoinSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
+	bool PJoinSession(FUniqueNetIdRepl UserId, FName SessionName, const FOnlineSessionSearchResult& SearchResult);
 	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 	// Destroy a session
