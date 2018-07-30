@@ -21,6 +21,9 @@ void APitPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	DOREPLIFETIME(APitPlayerState, SelectedHero);
 	DOREPLIFETIME(APitPlayerState, bHasCharacterSelected);
 	DOREPLIFETIME(APitPlayerState, SelectedPawn);
+	//DOREPLIFETIME(APitPlayerState, Score);
+	DOREPLIFETIME(APitPlayerState, Kills);
+	DOREPLIFETIME(APitPlayerState, Deaths);
 }
 
 void APitPlayerState::SelectCharacter(TSubclassOf<class APitCharacter> Character)
@@ -49,21 +52,6 @@ void APitPlayerState::SelectCharacter(TSubclassOf<class APitCharacter> Character
 					PC->SpawnPlayerHUD();
 					UpdateEnemyHUDs();
 				}
-
-				//APitGameMode* Mode = Cast<APitGameMode>(GetWorld()->GetAuthGameMode());
-				//if (Mode)
-				//{
-				//	Mode->DefaultPawnClass = Character;
-				//	AActor* SpawnedActor = GetWorld()->SpawnActor(Character);
-				//	if (SpawnedActor)
-				//	{
-				//		SelectedPawn = Cast<APitCharacter>(SpawnedActor);
-				//		PC->SelectCharacter(Cast<APawn>(SpawnedActor));
-				//		PC->SpawnPlayerHUD();
-				//		//PC->AddPlayerEnemies();
-				//		//UE_LOG(LogTemp, Warning, TEXT("The pawn was created"));
-				//	}
-				//}
 
 				for (auto& PlayerS : GetWorld()->GetGameState()->PlayerArray) 
 				{
@@ -97,36 +85,19 @@ void APitPlayerState::OnRep_CharacterSelected()
 		PC->SpawnPlayerHUD();
 		UpdateEnemyHUDs();
 	}
+}
 
-
-	//APitPlayerController* PC = Cast<APitPlayerController>(GetOwner());
-	//if (PC)
-	//{
-	//	UE_LOG(LogTemp, Warning, TEXT("Someone picked something"));
-	//	if (Role < ROLE_Authority)
-	//	{
-	//		PC->HiddeSelectionWidget();
-	//		PC->SpawnPlayerHUD();
-	//		//PC->AddPlayerEnemies();
-	//		//UpdateEnemyHUDs();
-
-	//		for (auto& PlayerS : GetWorld()->GetGameState()->PlayerArray)
-	//		{
-	//			APitPlayerState* PitPlayerS = Cast<APitPlayerState>(PlayerS);
-	//			if (PitPlayerS && PitPlayerS->HasCharacterSelected())
-	//			{
-	//				PitPlayerS->UpdateEnemyHUDs();
-	//			}
-	//		}
-	//	}
-	//}
-
-	//UpdateEnemyHUDs();
+void APitPlayerState::OnRep_ScoreModified()
+{
+	if (UpdateScoreDelegate.IsBound())
+	{
+		UpdateScoreDelegate.Broadcast();
+	}
 }
 
 void APitPlayerState::UpdateEnemyHUDs_Implementation()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player is: %s"), *GetPlayerName());
+	//UE_LOG(LogTemp, Warning, TEXT("Player is: %s"), *GetPlayerName());
 	APitPlayerController* PC = Cast<APitPlayerController>(GetOwner());
 	if (PC)
 	{
@@ -140,4 +111,15 @@ void APitPlayerState::UpdateEnemyHUDs_Implementation()
 bool APitPlayerState::HasCharacterSelected()
 {
 	return bHasCharacterSelected;
+}
+
+void APitPlayerState::UpdatePlayerKills(int32 Amount)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("Modified kills, nice"));
+	Kills += Amount;
+}
+
+void APitPlayerState::UpdatePlayerDeaths(int32 Amount)
+{
+	Deaths += Amount;
 }

@@ -242,6 +242,11 @@ void APitPlayerController::EscapePressed()
 
 void APitPlayerController::ScorePressed()
 {
+	if (HUDWidget)
+	{
+		bShowingScore = !bShowingScore;
+		HUDWidget->DisplayScore(bShowingScore);
+	}
 }
 
 void APitPlayerController::LMBPressed()

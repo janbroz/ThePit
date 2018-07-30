@@ -66,5 +66,6 @@ public:
 
 private:
 	uint32 bHasCharacterSelected : 1;
+	uint32 bShowingScore : 1;
 
 };

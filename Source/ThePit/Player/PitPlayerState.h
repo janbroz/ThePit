@@ -9,6 +9,8 @@
 /**
  * 
  */
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FUIDelegate_OnUpdateScore);
+
 UCLASS()
 class THEPIT_API APitPlayerState : public APlayerState
 {
@@ -22,13 +24,23 @@ public:
 		void ServerSelectCharacter(TSubclassOf<class APitCharacter> Character);
 	UFUNCTION()
 		void OnRep_CharacterSelected();
+	UFUNCTION()
+		void OnRep_ScoreModified();
 	UFUNCTION(BlueprintCallable)
 		bool HasCharacterSelected();
 
 	UFUNCTION(Client, Reliable)
 		void UpdateEnemyHUDs();
+	UFUNCTION()
+		void UpdatePlayerKills(int32 Amount);
+	UFUNCTION()
+		void UpdatePlayerDeaths(int32 Amount);
+
 
 public:
+
+	UPROPERTY(BlueprintAssignable)
+		FUIDelegate_OnUpdateScore UpdateScoreDelegate;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = PlayerInformation, Replicated)
 		TSubclassOf<class APitCharacter> SelectedHero;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = PlayerInformation)
@@ -36,5 +48,8 @@ public:
 	//UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = PlayerInformation, Replicated)
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_CharacterSelected, BlueprintReadOnly)
 		uint32 bHasCharacterSelected : 1;
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PlayerInfo, ReplicatedUsing = OnRep_ScoreModified)
+		int32 Kills;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PlayerInfo, ReplicatedUsing = OnRep_ScoreModified)
+		int32 Deaths;
 };

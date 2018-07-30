@@ -28,6 +28,8 @@ public:
 		void AddPlayerEnemy();
 	UFUNCTION(BlueprintImplementableEvent)
 		void UpdateEnemyHealthBars(class APitCharacter* Enemy);
+	UFUNCTION(BlueprintImplementableEvent)
+		void DisplayScore(bool bShowScore);
 
 
 };

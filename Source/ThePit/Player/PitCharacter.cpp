@@ -7,6 +7,8 @@
 #include "Net/UnrealNetwork.h"
 #include "Engine/ActorChannel.h"
 #include "Player/PitPlayerState.h"
+#include "PitGameState.h"
+#include "Engine/World.h"
 
 // Sets default values
 APitCharacter::APitCharacter()
@@ -123,7 +125,18 @@ float APitCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	else
 	{
 		AbilitySystem->AttributeSet->ModifyAttribute();
+		if (AbilitySystem->AttributeSet->Health.CurrentValue <= 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("It should give the player a point"));
+			APitGameState* GState = Cast<APitGameState>(GetWorld()->GetGameState());
+			if (GState)
+			{
+				GState->PlayerScoreKill(PlayerState);
+			}
+		}
 	}
+
+	
 
 	return NewDamage;
 }
