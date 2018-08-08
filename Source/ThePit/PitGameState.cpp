@@ -38,3 +38,12 @@ void APitGameState::PlayerScoreKill(class APlayerState* Instigator)
 		UpdateScoreDelegate.Broadcast();
 	}
 }
+
+void APitGameState::PlayerGainExperience(class APlayerState* PlayerInstigator, int32 Amount)
+{
+	APitPlayerState* Player = Cast<APitPlayerState>(PlayerInstigator);
+	if (Player)
+	{
+		Player->GainExperience(Amount);
+	}
+}

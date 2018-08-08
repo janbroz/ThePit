@@ -150,3 +150,31 @@ bool APitCharacter::Server_TakeDamage_Validate(float Damage, struct FDamageEvent
 {
 	return true;
 }
+
+void APitCharacter::Attack(AActor* Target)
+{
+	if (Role < ROLE_Authority)
+	{
+		ServerAttack(Target);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("This was a valid attack"));
+		APitCharacter* CharacterTarget = Cast<APitCharacter>(Target);
+		if (CharacterTarget)
+		{
+			CharacterTarget->AbilitySystem->AttributeSet->ModifyAttribute();
+
+		}
+	}
+}
+
+void APitCharacter::ServerAttack_Implementation(AActor* Target)
+{
+	Attack(Target);
+}
+
+bool APitCharacter::ServerAttack_Validate(AActor* Target)
+{
+	return true;
+}

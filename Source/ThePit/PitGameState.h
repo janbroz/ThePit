@@ -22,6 +22,9 @@ public:
 
 	void PlayerScoreKill(class APlayerState* Instigator);
 
+	UFUNCTION(BlueprintCallable)
+		void PlayerGainExperience(class APlayerState* PlayerInstigator, int32 Amount);
+
 public:
 	UPROPERTY(BlueprintAssignable)
 		FUIDelegate_OnUIScoreUpdate UpdateScoreDelegate;

@@ -47,6 +47,11 @@ public:
 	virtual void PostInitializeComponents() override;
 	//virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
 
+	UFUNCTION()
+		void Attack(AActor* Target);
+	UFUNCTION(Reliable, Server, WithValidation)
+		void ServerAttack(AActor* Target);
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character information")
 		FString HeroName;

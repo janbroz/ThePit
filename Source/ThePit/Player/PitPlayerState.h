@@ -26,6 +26,8 @@ public:
 		void OnRep_CharacterSelected();
 	UFUNCTION()
 		void OnRep_ScoreModified();
+	UFUNCTION()
+		void OnRep_LevelModified();
 	UFUNCTION(BlueprintCallable)
 		bool HasCharacterSelected();
 
@@ -35,7 +37,10 @@ public:
 		void UpdatePlayerKills(int32 Amount);
 	UFUNCTION()
 		void UpdatePlayerDeaths(int32 Amount);
-
+	UFUNCTION()
+		void GainExperience(int Amount);
+	UFUNCTION()
+		void LevelUp();
 
 public:
 
@@ -52,4 +57,11 @@ public:
 		int32 Kills;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = PlayerInfo, ReplicatedUsing = OnRep_ScoreModified)
 		int32 Deaths;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = PlayerInfo, Replicated)
+		int32 CurrentExperience;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = PlayerInfo, Replicated)
+		int32 NeededExperience;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = PlayerInfo, ReplicatedUsing = OnRep_LevelModified)
+		int32 Level;
+
 };

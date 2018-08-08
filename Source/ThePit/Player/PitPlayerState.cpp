@@ -11,7 +11,8 @@
 APitPlayerState::APitPlayerState()
 {
 	bAlwaysRelevant = true;
-
+	Level = 1;
+	NeededExperience = 100;
 }
 
 void APitPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -24,6 +25,9 @@ void APitPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	//DOREPLIFETIME(APitPlayerState, Score);
 	DOREPLIFETIME(APitPlayerState, Kills);
 	DOREPLIFETIME(APitPlayerState, Deaths);
+	DOREPLIFETIME(APitPlayerState, CurrentExperience);
+	DOREPLIFETIME(APitPlayerState, NeededExperience);
+	DOREPLIFETIME(APitPlayerState, Level);
 }
 
 void APitPlayerState::SelectCharacter(TSubclassOf<class APitCharacter> Character)
@@ -95,6 +99,11 @@ void APitPlayerState::OnRep_ScoreModified()
 	}
 }
 
+void APitPlayerState::OnRep_LevelModified()
+{
+
+}
+
 void APitPlayerState::UpdateEnemyHUDs_Implementation()
 {
 	//UE_LOG(LogTemp, Warning, TEXT("Player is: %s"), *GetPlayerName());
@@ -122,4 +131,23 @@ void APitPlayerState::UpdatePlayerKills(int32 Amount)
 void APitPlayerState::UpdatePlayerDeaths(int32 Amount)
 {
 	Deaths += Amount;
+}
+
+void APitPlayerState::GainExperience(int Amount)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Gaining experience yay"));
+	CurrentExperience += Amount;
+	int32 Remaining = CurrentExperience - NeededExperience;
+	if (Remaining >= 0)
+	{
+		LevelUp();
+		GainExperience(Remaining);
+	}
+}
+
+void APitPlayerState::LevelUp()
+{
+	CurrentExperience = 0;
+	NeededExperience *= 1.20f;
+	Level++;
 }

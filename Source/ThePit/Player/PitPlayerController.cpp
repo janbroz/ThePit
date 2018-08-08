@@ -258,8 +258,10 @@ void APitPlayerController::LMBPressed()
 	if (Hit.bBlockingHit)
 	{
 		APitCharacter* HitChar = Cast<APitCharacter>(Hit.GetActor());
-		if (HitChar)
+		auto* SelfChar = Cast<APitCharacter>(GetPawn());
+		if (HitChar && SelfChar)
 		{
+			SelfChar->Attack(HitChar);
 			FString Bla = FString::FromInt(HitChar->AbilitySystem->AttributeSet->Health.CurrentValue);
 			UE_LOG(LogTemp, Warning, TEXT("Client character health is: %s"), *Bla);
 		}
