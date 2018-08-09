@@ -254,17 +254,10 @@ void APitPlayerController::LMBPressed()
 	FHitResult Hit;
 
 	GetHitResultUnderCursor(ECollisionChannel::ECC_Camera, true, Hit);
-
-	if (Hit.bBlockingHit)
+	APitCharacter* SelfChar = Cast<APitCharacter>(GetPawn());
+	if (Hit.bBlockingHit && SelfChar)
 	{
-		APitCharacter* HitChar = Cast<APitCharacter>(Hit.GetActor());
-		auto* SelfChar = Cast<APitCharacter>(GetPawn());
-		if (HitChar && SelfChar)
-		{
-			SelfChar->Attack(HitChar);
-			FString Bla = FString::FromInt(HitChar->AbilitySystem->AttributeSet->Health.CurrentValue);
-			UE_LOG(LogTemp, Warning, TEXT("Client character health is: %s"), *Bla);
-		}
+		SelfChar->Attack(Hit.Location, EAttackType::PrimaryAttack);
 	}
 }
 

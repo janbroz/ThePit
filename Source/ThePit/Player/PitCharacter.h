@@ -48,9 +48,9 @@ public:
 	//virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
 
 	UFUNCTION()
-		void Attack(AActor* Target);
+		void Attack(FVector AttackLocation, EAttackType TypeOfAttack);
 	UFUNCTION(Reliable, Server, WithValidation)
-		void ServerAttack(AActor* Target);
+		void ServerAttack(FVector AttackLocation, EAttackType TypeOfAttack);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character information")

@@ -9,6 +9,7 @@
 #include "Player/PitPlayerState.h"
 #include "PitGameState.h"
 #include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 APitCharacter::APitCharacter()
@@ -151,30 +152,38 @@ bool APitCharacter::Server_TakeDamage_Validate(float Damage, struct FDamageEvent
 	return true;
 }
 
-void APitCharacter::Attack(AActor* Target)
+/*	This is where we should do a lot of stuff to check how is our pawn going
+	to attack. Is it melee? Ranged? A Spell? Lets figure it!
+*/
+void APitCharacter::Attack(FVector AttackLocation, EAttackType TypeOfAttack)
 {
+	DrawDebugLine(GetWorld(), GetActorLocation(), AttackLocation, FColor::Red, false, 2.f, 1, 2.f);
+
+
 	if (Role < ROLE_Authority)
 	{
-		ServerAttack(Target);
+		ServerAttack(AttackLocation, TypeOfAttack);
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("This was a valid attack"));
-		APitCharacter* CharacterTarget = Cast<APitCharacter>(Target);
+		
+		
+		/*APitCharacter* CharacterTarget = Cast<APitCharacter>(Target);
 		if (CharacterTarget)
 		{
 			CharacterTarget->AbilitySystem->AttributeSet->ModifyAttribute();
 
-		}
+		}*/
 	}
 }
 
-void APitCharacter::ServerAttack_Implementation(AActor* Target)
+void APitCharacter::ServerAttack_Implementation(FVector AttackLocation, EAttackType TypeOfAttack)
 {
-	Attack(Target);
+	Attack(AttackLocation, TypeOfAttack);
 }
 
-bool APitCharacter::ServerAttack_Validate(AActor* Target)
+bool APitCharacter::ServerAttack_Validate(FVector AttackLocation, EAttackType TypeOfAttack)
 {
 	return true;
 }

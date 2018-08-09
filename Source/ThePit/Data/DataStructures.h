@@ -36,6 +36,38 @@ enum class EHeroClass : uint8
 	Ranger			UMETA(DisplayName = "Ranger")
 };
 
+UENUM(BlueprintType)
+enum class EAttackType : uint8
+{
+	PrimaryAttack		UMETA(DisplayName = "Primary attack"),
+	SecondaryAttack		UMETA(DisplayName = "Secondary attack"),
+	SpecialAttack		UMETA(DisplayName = "Special attack")
+};
+
+UENUM(BlueprintType)
+enum class EArmorSlot : uint8
+{
+	Head				UMETA(DisplayName = "Head"),
+	Chest				UMETA(DisplayName = "Chest"),
+	Legs				UMETA(DisplayName = "Legs"),
+	Foot				UMETA(DisplayName = "Foot"),
+	Hands				UMETA(DisplayName = "Hands")
+};
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	OneHand				UMETA(DisplayName = "One hand"),
+	TwoHand				UMETA(DisplayName = "Two hands")
+};
+
+UENUM(BlueprintType)
+enum class EWeaponSlot : uint8
+{
+	LeftHand			UMETA(DisplayName = "Left hand"),
+	RightHand			UMETA(DisplayName = "Right hand")
+};
+
 USTRUCT(Blueprintable)
 struct FHeroStats : public FTableRowBase
 {
