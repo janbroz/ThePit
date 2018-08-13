@@ -37,6 +37,8 @@ public:
 	void SpawnPlayerHUD();
 	void AddPlayerEnemies();
 
+	void ShowPlayerInventory();
+
 	void TEST_INPUT();
 	void Test2();
 
@@ -67,5 +69,6 @@ public:
 private:
 	uint32 bHasCharacterSelected : 1;
 	uint32 bShowingScore : 1;
+	uint32 bShowingInventory : 1;
 
 };

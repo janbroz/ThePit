@@ -7,6 +7,7 @@
 #include "Runtime/CoreUObject/Public/UObject/ConstructorHelpers.h"
 #include "PitAbilities/PitAbilityComponent.h"
 #include "Player/PitPlayerState.h"
+#include "Items/Item.h"
 
 APitPlayerController::APitPlayerController()
 {
@@ -62,6 +63,7 @@ void APitPlayerController::SetupInputComponent()
 	InputComponent->BindAction("RMB", IE_Pressed, this, &APitPlayerController::RMBPressed);
 	InputComponent->BindAction("TestInput", IE_Pressed, this, &APitPlayerController::TEST_INPUT);
 	InputComponent->BindAction("Spacebar", IE_Pressed, this, &APitPlayerController::Test2);
+	InputComponent->BindAction("Inventory", IE_Pressed, this, &APitPlayerController::ShowPlayerInventory);
 }
 
 void APitPlayerController::Tick(float DeltaSeconds)
@@ -94,21 +96,7 @@ void APitPlayerController::TEST_INPUT()
 
 void APitPlayerController::Test2()
 {
-	//if (Role < ROLE_Authority)
-	//{
-	//	Server_Test2();
-	//}
-	//else
-	//{
-	//	APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
-	//	if (PitPawn)
-	//	{
-	//		//FString Bla = PitPawn->AbilitySystem->TestBool2 ? "yes" : "no";
-	//		FString Bla = FString::FromInt(PitPawn->AbilitySystem->AttributeSet->Health.CurrentValue);
-	//		UE_LOG(LogTemp, Warning, TEXT("Server character health is: %s"), *Bla);
-	//	}
-	//}
-
+	
 	APitCharacter* PitPawn = Cast<APitCharacter>(GetPawn());
 	if (PitPawn)
 	{
@@ -257,7 +245,16 @@ void APitPlayerController::LMBPressed()
 	APitCharacter* SelfChar = Cast<APitCharacter>(GetPawn());
 	if (Hit.bBlockingHit && SelfChar)
 	{
-		SelfChar->Attack(Hit.Location, EAttackType::PrimaryAttack);
+		AItem* TargetAsItem = Cast<AItem>(Hit.GetActor());
+		if (TargetAsItem)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("We clicked an item"));
+			SelfChar->PickUpItem(TargetAsItem);
+		}
+		else
+		{
+			SelfChar->Attack(Hit.Location, EAttackType::PrimaryAttack);
+		}
 	}
 }
 
@@ -327,4 +324,17 @@ void APitPlayerController::AddPlayerEnemies()
 			HUDWidget->AddPlayerEnemy();
 		}
 	}
+}
+
+void APitPlayerController::ShowPlayerInventory()
+{
+	bShowingInventory = !bShowingInventory;
+	if (IsLocalController())
+	{
+		if (HUDWidget)
+		{
+			HUDWidget->ShowInventory(bShowingInventory);
+		}
+	}
+
 }

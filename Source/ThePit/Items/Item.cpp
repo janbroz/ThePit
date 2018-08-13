@@ -10,6 +10,9 @@ AItem::AItem()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Item mesh"));
+	
+	SetReplicates(true);
+	
 }
 
 // Called when the game starts or when spawned

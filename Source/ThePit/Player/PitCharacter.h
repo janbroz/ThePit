@@ -29,23 +29,30 @@ public:
 
 	virtual void PossessedBy(AController* NewController) override;
 
+	virtual void PostInitializeComponents() override;
+	//virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
+
+public:
+	// Networking stuff.
 	UFUNCTION(BlueprintCallable)
 		virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
 	UFUNCTION(Reliable, Server, WithValidation)
 		void Server_TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
-
-
+	
 	UFUNCTION(NetMulticast, Unreliable)
 		void Multicast_UpdateEnemyHUDs();
-
+	
 	UFUNCTION()
 		void OnRep_AbilitySystemReplicated();
 	UFUNCTION()
+		void OnRep_InventoryReplicated();
+	UFUNCTION()
 		void OnRep_BoolTest();
 
-	virtual void PostInitializeComponents() override;
-	//virtual bool ReplicateSubobjects(class UActorChannel *Channel, class FOutBunch *Bunch, FReplicationFlags *RepFlags) override;
+	UFUNCTION()
+		void PickUpItem(class AItem* ItemToPick);
+	UFUNCTION(Reliable, Server, WithValidation)
+		void Server_PickUpItem(class AItem* ItemToPick);
 
 	UFUNCTION()
 		void Attack(FVector AttackLocation, EAttackType TypeOfAttack);
@@ -63,6 +70,8 @@ public:
 		int32 Bla;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character information", Transient, ReplicatedUsing = OnRep_AbilitySystemReplicated)
 		class UPitAbilityComponent* AbilitySystem;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Character information", ReplicatedUsing = OnRep_InventoryReplicated)
+		class UInventoryComponent* InventoryManager;
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_BoolTest)
 		bool BoolTest;
 	/*UPROPERTY(Replicated)

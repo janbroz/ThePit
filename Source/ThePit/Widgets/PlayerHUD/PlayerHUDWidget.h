@@ -30,6 +30,8 @@ public:
 		void UpdateEnemyHealthBars(class APitCharacter* Enemy);
 	UFUNCTION(BlueprintImplementableEvent)
 		void DisplayScore(bool bShowScore);
+	UFUNCTION(BlueprintImplementableEvent)
+		void ShowInventory(bool Show);
 
 
 };

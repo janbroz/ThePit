@@ -10,11 +10,13 @@
 #include "PitGameState.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "Items/InventoryComponent.h"
+#include "Items/Item.h"
 
 // Sets default values
 APitCharacter::APitCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CameraArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraArm"));
@@ -36,6 +38,13 @@ APitCharacter::APitCharacter()
 	{
 		AbilitySystem->SetNetAddressable();
 		AbilitySystem->SetIsReplicated(true);
+	}
+
+	InventoryManager = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory manager"));
+	if (InventoryManager)
+	{
+		InventoryManager->SetNetAddressable();
+		InventoryManager->SetIsReplicated(true);
 	}
 	bReplicates = true;
 	
@@ -72,6 +81,7 @@ void APitCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(APitCharacter, AbilitySystem);
+	DOREPLIFETIME(APitCharacter, InventoryManager);
 	DOREPLIFETIME(APitCharacter, BoolTest);
 	/*DOREPLIFETIME(APitCharacter, Attributes);*/
 }
@@ -104,6 +114,11 @@ void APitCharacter::OnRep_BoolTest()
 	UE_LOG(LogTemp, Warning, TEXT("Bool test changed"));
 }
 
+void APitCharacter::OnRep_InventoryReplicated()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Inventory was replicated"));
+}
+
 void APitCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -112,6 +127,8 @@ void APitCharacter::PostInitializeComponents()
 	{
 		AbilitySystem->SetIsReplicated(true);
 		AbilitySystem->InitiAttributeSet();
+		InventoryManager->SetIsReplicated(true);
+		InventoryManager->InitSlots();
 	}
 }
 
@@ -136,9 +153,6 @@ float APitCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 			}
 		}
 	}
-
-	
-
 	return NewDamage;
 }
 
@@ -184,6 +198,31 @@ void APitCharacter::ServerAttack_Implementation(FVector AttackLocation, EAttackT
 }
 
 bool APitCharacter::ServerAttack_Validate(FVector AttackLocation, EAttackType TypeOfAttack)
+{
+	return true;
+}
+
+void APitCharacter::PickUpItem(AItem* ItemToPick)
+{
+	if (Role < ROLE_Authority)
+	{
+		Server_PickUpItem(ItemToPick);
+	}
+	else
+	{
+		if (InventoryManager)
+		{
+			InventoryManager->AddItemToInventory(ItemToPick);
+		}
+	}
+}
+
+void APitCharacter::Server_PickUpItem_Implementation(AItem* ItemToPick)
+{
+	PickUpItem(ItemToPick);
+}
+
+bool APitCharacter::Server_PickUpItem_Validate(AItem* ItemToPick)
 {
 	return true;
 }
